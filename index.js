@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
+const crypto = require('crypto');
 
 const TALKER_JSON = './talker.json';
 
@@ -46,4 +47,14 @@ app.get('/talker/:id', async (req, res) => {
    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   return res.status(200).send(talkersId);
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+   return res.status(400).json({ message: 'Login inválido' });
+  }
+  const token = crypto.randomBytes(8).toString('hex');
+  return res.status(200).json({ token });
 });
