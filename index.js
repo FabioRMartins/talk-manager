@@ -127,10 +127,10 @@ const addTalkWatchedAt = (req, res, next) => {
 
 const addTalkRate = (req, res, next) => {
   const { talk: { rate } } = req.body;
-  if (!rate) return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
-  if (rate < 1 || rate > 5) {
+  if (rate < 1 || rate > 5 || rate === 0) {
     return res.status(400).json({ message: 'O campo "rate" deve ser um inteiro de 1 à 5' });
   }
+  if (!rate) return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
   next();
 };
 
@@ -147,4 +147,14 @@ app.post('/talker', addAuthorization, addName, addAge, addTalk, addTalkWatchedAt
  addTalker,
 async (req, res) => {
    res.status(201).json(addTalker); 
+});
+
+app.put('/talker/:id', addAuthorization, addName, addAge, addTalk, addTalkWatchedAt, addTalkRate,
+ async (req, res) => {
+  const { id } = req.params;
+  const talkers = await readTalkers();
+  const talker = talkers.findIndex((edit) => edit.id === Number(id));
+  talkers[talker] = { ...talkers[talker], ...req.body };
+  await fs.writeFile(TALKER_JSON, JSON.stringify(talkers));
+   return res.status(200).json(talkers[talker]); 
 });
