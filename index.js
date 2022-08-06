@@ -158,3 +158,11 @@ app.put('/talker/:id', addAuthorization, addName, addAge, addTalk, addTalkWatche
   await fs.writeFile(TALKER_JSON, JSON.stringify(talkers));
    return res.status(200).json(talkers[talker]); 
 });
+
+app.delete('/talker/:id', addAuthorization, async (req, res) => {
+  const { id } = req.params;
+  const talkers = await readTalkers();
+  const talker = talkers.findIndex((delet) => delet.id === Number(id));
+  await fs.writeFile(TALKER_JSON, JSON.stringify(talker));
+   return res.status(204).end(); 
+});
